@@ -136,47 +136,336 @@ const closePopup = () => {
   return(
     <>
       <style>{`
+        body {
+          font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+          background: linear-gradient(135deg, #232933 0%, #2b3a4a 100%);
+        }
         .calendar-app {
           display: flex;
           align-items: flex-start;
+          min-height: 760px;
+          padding: 48px 48px 48px 48px;
+          border-radius: 32px;
+          background: rgba(30, 34, 44, 0.98);
+          box-shadow: 0 8px 48px 0 rgba(0,0,0,0.25);
+          max-width: 1200px;
+          margin: 48px auto;
+          gap: 48px;
         }
         .calendar {
           flex: 1;
+          min-width: 420px;
+          max-width: 700px;
+          margin-right: 0;
+          padding: 32px 32px 32px 32px;
+          background: rgba(36, 40, 54, 0.98);
+          border-radius: 24px;
+          box-shadow: 0 2px 16px 0 rgba(0,0,0,0.10);
+        }
+        .calendar .heading {
+          font-family: 'Montserrat', 'Inter', Arial, sans-serif;
+          font-size: 2.8em;
+          font-weight: 900;
+          letter-spacing: 2px;
+          margin-bottom: 18px;
+          color: #fff;
+        }
+        .calendar .navigate-date {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 18px;
+        }
+        .calendar .month, .calendar .year {
+          font-size: 1.5em;
+          font-weight: 700;
+          color: #fff;
+        }
+        .calendar .buttons i {
+          font-size: 2em;
+          color: #18aaff;
+          background: #232933;
+          border-radius: 50%;
+          padding: 6px 10px;
+          margin: 0 2px;
+          cursor: pointer;
+          transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+          box-shadow: 0 2px 8px rgba(24,170,255,0.08);
+        }
+        .calendar .buttons i:hover {
+          background: #18aaff;
+          color: #fff;
+        }
+        .calendar .weekdays {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 8px;
+          font-weight: 700;
+          color: #8fa1b3;
+          letter-spacing: 1px;
+        }
+        .calendar .days {
+          display: grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 10px;
+          margin-bottom: 16px;
+        }
+        .calendar .days span {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 48px;
+          height: 48px;
+          font-size: 1.1em;
+          color: #dbeafe;
+          background: transparent;
+          border-radius: 12px;
+          cursor: pointer;
+          transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+          font-weight: 500;
+        }
+        .calendar .days span.current-day {
+          background: linear-gradient(135deg, #6d28d9 60%, #18aaff 100%);
+          color: #fff;
+          font-weight: 700;
+          box-shadow: 0 0 24px 0 #6d28d9aa;
+          border-radius: 50%;
+          font-size: 1.2em;
+        }
+        .calendar .days span:hover:not(.current-day) {
+          background: #18aaff33;
+          color: #18aaff;
+          box-shadow: 0 2px 8px #18aaff22;
         }
         .events-sidebar {
-          width: 350px;
-          margin-left: 32px;
-          min-height: 500px;
-          position: relative;
+          width: 400px;
+          min-width: 320px;
+          min-height: 600px;
+          background: linear-gradient(135deg, #18aaff 60%, #6d28d9 100%);
+          border-radius: 24px;
+          padding: 36px 28px 28px 28px;
+          box-sizing: border-box;
+          display: flex;
+          flex-direction: column;
+          gap: 24px;
+          box-shadow: 0 4px 32px 0 rgba(24,170,255,0.10);
         }
-        @media (max-width: 700px) {
+        .events-sidebar h3 {
+          color: #fff;
+          font-size: 1.3em;
+          font-weight: 800;
+          letter-spacing: 1px;
+          margin-bottom: 18px;
+        }
+        .event-strip {
+          background: #fff;
+          color: #232933;
+          border-radius: 16px;
+          padding: 22px 28px;
+          margin-bottom: 18px;
+          font-size: 1.15em;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          box-shadow: 0 4px 16px rgba(24,170,255,0.10);
+          cursor: pointer;
+          transition: transform 0.18s, box-shadow 0.18s;
+        }
+        .event-strip:hover {
+          transform: translateY(-2px) scale(1.025);
+          box-shadow: 0 8px 32px rgba(24,170,255,0.18);
+        }
+        .event-strip .event-info {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+        .event-strip .event-title {
+          font-size: 1.18em;
+          font-weight: bold;
+          color: #232933;
+          margin-bottom: 2px;
+        }
+        .event-strip .event-time {
+          color: #18aaff;
+          font-size: 1.08em;
+          font-weight: 700;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+        }
+        .event-strip .event-time:before {
+          content: '\u{1F552}';
+          font-size: 1em;
+          margin-right: 4px;
+          opacity: 0.7;
+        }
+        .event-strip .event-actions {
+          display: flex;
+          gap: 18px;
+          align-items: center;
+        }
+        .event-strip .event-actions i {
+          font-size: 1.35em;
+          color: #18aaff;
+          cursor: pointer;
+          transition: color 0.18s;
+        }
+        .event-strip .event-actions i:last-child {
+          color: #ff5c5c;
+        }
+        .event-strip .event-actions i:hover {
+          color: #6d28d9;
+        }
+        @media (max-width: 1100px) {
           .calendar-app {
             flex-direction: column;
-            align-items: stretch;
+            gap: 32px;
+            padding: 24px;
           }
           .calendar {
-            width: 100%;
-            min-width: 0;
+            margin-right: 0;
+            margin-bottom: 32px;
           }
           .events-sidebar {
             width: 100%;
-            margin-left: 0;
-            margin-top: 24px;
-            min-height: unset;
+            min-width: 0;
+            min-height: 300px;
           }
         }
-        @media (max-width: 500px) {
+        @media (max-width: 700px) {
           .calendar-app {
-            padding: 0 4px;
-          }
-          .calendar, .events-sidebar {
             padding: 0 2vw;
           }
-          .event-popup, .event {
-            font-size: 0.95em;
+          .calendar, .events-sidebar {
+            padding: 12px 2vw;
           }
-          .event-popup-button, .event-popup-close {
+        }
+        .event-modal-backdrop {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          background: rgba(30, 34, 44, 0.45);
+          backdrop-filter: blur(6px);
+          z-index: 1000;
+          transition: background 0.2s;
+        }
+        .event-modal {
+          position: fixed;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 420px;
+          max-width: 95vw;
+          background: rgba(36, 40, 54, 0.85);
+          color: #fff;
+          box-shadow: 0 8px 48px 0 rgba(24,170,255,0.18);
+          border-radius: 32px;
+          z-index: 1001;
+          display: flex;
+          flex-direction: column;
+          padding: 48px 40px 36px 40px;
+          animation: fadeInModal 0.25s cubic-bezier(.4,1.4,.6,1);
+          backdrop-filter: blur(8px);
+          border: 1.5px solid rgba(255,255,255,0.08);
+        }
+        @keyframes fadeInModal {
+          from { opacity: 0; transform: translate(-50%, -60%); }
+          to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+        .event-modal-title {
+          font-size: 2em;
+          font-weight: 900;
+          margin-bottom: 32px;
+          letter-spacing: 1px;
+          text-align: left;
+          color: #fff;
+        }
+        .event-modal-close {
+          position: absolute;
+          top: 24px;
+          right: 32px;
+          background: none;
+          border: none;
+          color: #18aaff;
+          font-size: 2.2em;
+          cursor: pointer;
+          z-index: 10;
+          transition: color 0.18s;
+          font-weight: 900;
+        }
+        .event-modal-close:hover {
+          color: #ff5c5c;
+        }
+        .event-modal input, .event-modal textarea, .event-modal select {
+          width: 100%;
+          margin-bottom: 22px;
+          border-radius: 10px;
+          border: none;
+          padding: 16px 14px;
+          font-size: 1.15em;
+          background: rgba(255,255,255,0.10);
+          color: #fff;
+          box-shadow: 0 2px 8px #0002;
+          outline: none;
+          transition: box-shadow 0.18s, background 0.18s;
+          font-family: inherit;
+        }
+        .event-modal input:focus, .event-modal textarea:focus, .event-modal select:focus {
+          box-shadow: 0 0 0 2px #18aaff;
+          background: rgba(24,170,255,0.10);
+        }
+        .event-modal .event-modal-actions {
+          display: flex;
+          gap: 18px;
+          margin-top: 18px;
+        }
+        .event-modal .event-popup-button {
+          background: linear-gradient(90deg, #18aaff 60%, #6d28d9 100%);
+          color: #fff;
+          border: none;
+          border-radius: 10px;
+          font-size: 1.25em;
+          font-weight: 800;
+          padding: 18px 0;
+          box-shadow: 0 2px 12px #18aaff33;
+          cursor: pointer;
+          transition: background 0.18s, box-shadow 0.18s;
+          letter-spacing: 1px;
+          display: block;
+          margin: 0 auto;
+          width: 80%;
+        }
+        .event-modal .event-popup-button:hover {
+          background: linear-gradient(90deg, #6d28d9 60%, #18aaff 100%);
+          box-shadow: 0 4px 24px #18aaff33;
+        }
+        @media (max-width: 600px) {
+          .event-modal {
+            width: 98vw !important;
+            min-width: 0;
+            padding: 18px 6px 12px 6px;
+            border-radius: 18px;
+          }
+          .event-modal .event-modal-close {
+            top: 8px;
+            right: 10px;
+            font-size: 2em;
+          }
+          .event-modal-title {
+            font-size: 1.3em;
+            margin-bottom: 18px;
+          }
+          .event-modal input, .event-modal textarea, .event-modal select {
             font-size: 1em;
+            padding: 12px 8px;
+          }
+          .event-modal .event-popup-button {
+            font-size: 1.1em;
+            padding: 14px 0;
           }
         }
       `}</style>
@@ -204,115 +493,66 @@ const closePopup = () => {
         </div>
         <div className="events-sidebar">
             {showEventPopup && (
-            <div className="event-popup" style={{ position: 'relative', marginBottom: '24px', borderRadius: '16px' }}>
-                <input
-                    type="text"
-                    className="event-title-input"
-                    placeholder="Event Title (max 20 chars)"
-                    value={formData.title}
-                    onChange={e => handleInputChange('title', e.target.value)}
-                    maxLength={20}
-                    style={{
-                        width: '100%',
-                        fontSize: '1.3em',
-                        fontWeight: 'bold',
-                        marginBottom: '10px',
-                        borderRadius: '4px',
-                        border: 'none',
-                        padding: '8px',
-                        background: '#fff',
-                        color: '#000',
-                    }}
-                    required
-                />
-                <div className="time-input">
-                    <div className="event-popup-time">Time</div>
-                    <input type="number" className="hours" min={1} max={12} value={formData.hours} onChange={(e) => handleInputChange('hours', e.target.value)} style={{ background: '#fff', color: '#000', border: 'none', borderRadius: '4px', padding: '10px 16px', width: '70px', fontSize: '1.2em', marginRight: '12px' }} />
-                    <input type="number" className="minutes" min={0} max={59} value={formData.minutes} onChange={(e) => handleInputChange('minutes', e.target.value)} style={{ background: '#fff', color: '#000', border: 'none', borderRadius: '4px', padding: '10px 16px', width: '70px', fontSize: '1.2em', marginRight: '12px' }} />
-                    <select value={formData.ampm} onChange={e => handleInputChange('ampm', e.target.value)} style={{ background: '#fff', color: '#000', border: 'none', borderRadius: '4px', padding: '10px 16px', fontSize: '1.2em' }}>
-                        <option value="AM">AM</option>
-                        <option value="PM">PM</option>
-                    </select>
-                </div>
-                <textarea placeholder="Event Description (max 60 characters)" value={formData.desc} onChange={e => handleInputChange('desc', e.target.value)} maxLength={60} style={{ width: '100%', marginTop: '10px', marginBottom: '10px', borderRadius: '4px', border: 'none', padding: '8px', background: '#fff', color: '#000', fontSize: '1em' }} />
-                <button className="event-popup-button" onClick={editMode ? updateEvent : addEvent}>{editMode ? 'Update Event' : 'Add Event'}</button>
-                <button className="event-popup-close" onClick={closePopup}>
-                <i className="bx bx-x"></i>
+            <>
+              <div className="event-modal-backdrop" onClick={closePopup}></div>
+              <div className="event-modal">
+                <button className="event-modal-close" onClick={closePopup} aria-label="Close event modal">
+                  <i className="bx bx-x"></i>
                 </button>
-            </div>
+                <div className="event-modal-title">{editMode ? 'Edit Event' : 'Add Event'}</div>
+                <input
+                  type="text"
+                  className="event-title-input"
+                  placeholder="Event Title (max 20 chars)"
+                  value={formData.title}
+                  onChange={e => handleInputChange('title', e.target.value)}
+                  maxLength={20}
+                  required
+                />
+                <div style={{ display: 'flex', gap: '12px', marginBottom: '22px' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, marginBottom: 6 }}>Time</div>
+                    <input type="number" className="hours" min={1} max={12} value={formData.hours} onChange={(e) => handleInputChange('hours', e.target.value)} placeholder="hh" />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, marginBottom: 6, color: 'transparent' }}>:</div>
+                    <input type="number" className="minutes" min={0} max={59} value={formData.minutes} onChange={(e) => handleInputChange('minutes', e.target.value)} placeholder="mm" />
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 700, marginBottom: 6, color: 'transparent' }}>AM/PM</div>
+                    <select value={formData.ampm} onChange={e => handleInputChange('ampm', e.target.value)}>
+                      <option value="AM">AM</option>
+                      <option value="PM">PM</option>
+                    </select>
+                  </div>
+                </div>
+                <textarea placeholder="Event Description (max 60 characters)" value={formData.desc} onChange={e => handleInputChange('desc', e.target.value)} maxLength={60} />
+                <div className="event-modal-actions">
+                  <button className="event-popup-button" onClick={editMode ? updateEvent : addEvent}>{editMode ? 'Update Event' : 'Add Event'}</button>
+                </div>
+              </div>
+            </>
         )}    
             <h3 style={{ color: '#fff', marginBottom: '16px' }}>All Events</h3>
             {events.length === 0 ? (
-                <div style={{ color: '#aaa' }}>No events scheduled.</div>
+                <div style={{ color: '#fff' }}>No events scheduled.</div>
             ) : (
                 events.map((event) => (
                     <div
                         key={event.id}
-                        className="event"
-                        style={{
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            background: '#18aaff',
-                            borderRadius: '12px',
-                            marginBottom: '16px',
-                            padding: '16px',
-                            boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-                            minHeight: '64px',
-                        }}
+                        className="event-strip"
                         onClick={() => setExpandedEventId(expandedEventId === event.id ? null : event.id)}
                     >
-                        {/* Time column */}
-                        <div style={{
-                            minWidth: '70px',
-                            marginRight: '18px',
-                            textAlign: 'left',
-                            color: '#fff',
-                            fontWeight: 700,
-                            fontSize: '1.3em',
-                            lineHeight: 1.1,
-                        }}>
-                            <div>{event.time}</div>
-                        </div>
-                        {/* Title and description column */}
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                            <div
-                                className="event-title"
-                                style={{
-                                    fontSize: '1.25em',
-                                    fontWeight: 'bold',
-                                    color: '#fff',
-                                    marginBottom: event.desc ? '2px' : 0,
-                                    wordBreak: 'break-word',
-                                }}
-                            >
-                                {event.title}
-                            </div>
+                        <div className="event-info">
+                            <div className="event-title">{event.title}</div>
+                            <div className="event-time">{event.time}</div>
                             {expandedEventId === event.id && event.desc && (
-                                <div
-                                    className="event-desc"
-                                    style={{
-                                        color: '#f3f3f3',
-                                        marginTop: '6px',
-                                        fontSize: '1em',
-                                        background: '#1a4a6a',
-                                        borderRadius: '4px',
-                                        padding: '6px',
-                                        wordBreak: 'break-word',
-                                    }}
-                                >
-                                    {event.desc}
-                                </div>
+                                <div style={{ color: '#232933', marginTop: '8px', fontSize: '0.98em', background: '#eaf6fd', borderRadius: '8px', padding: '10px', wordBreak: 'break-word' }}>{event.desc}</div>
                             )}
                         </div>
-                        {/* Action buttons */}
-                        <div
-                            className="event-button"
-                            style={{ marginLeft: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}
-                            onClick={e => e.stopPropagation()}
-                        >
-                            <i className="bx bxs-edit-alt" onClick={() => editEvent(event.id)} style={{ fontSize: '1.2em', color: '#fff', cursor: 'pointer' }}></i>
-                            <i className="bx bxs-message-alt-x" onClick={() => removeEvent(event.id)} style={{ fontSize: '1.2em', color: '#fff', cursor: 'pointer' }}></i>
+                        <div className="event-actions" onClick={e => e.stopPropagation()}>
+                            <i className="bx bxs-edit-alt" onClick={() => editEvent(event.id)}></i>
+                            <i className="bx bxs-message-alt-x" onClick={() => removeEvent(event.id)}></i>
                         </div>
                     </div>
                 ))
