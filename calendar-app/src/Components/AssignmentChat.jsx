@@ -9,53 +9,63 @@ const AssignmentChat = ({ closeChat, addEvents }) => {
   const [extractedEvents, setExtractedEvents] = useState(null);
   const fileInputRef = useRef();
 
-  const handleSend = async () => {
-    if (!input.trim() || isProcessing) return;
-
-    const newMessages = [...messages, { sender: 'user', text: input }];
-    setMessages(newMessages);
-    setInput('');
+  const processTextOrFile = async (dataPayload, isFile = false) => {
     setIsProcessing(true);
     setExtractedEvents(null);
+
+    // Add a user message to the chat
+    const userMessage = isFile 
+        ? `Uploaded file: ${dataPayload.get('file').name}`
+        : dataPayload.get('text');
+    setMessages(prev => [...prev, { sender: 'user', text: userMessage }]);
+    if (!isFile) setInput('');
 
     try {
         const response = await fetch('http://localhost:5001/api/extract-events', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: input })
+            body: dataPayload 
+            // Note: No 'Content-Type' header. The browser sets it for FormData.
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            const errorData = await response.json();
+            throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
 
         if (data.events && data.events.length > 0) {
-            setMessages(msgs => [...msgs, { sender: 'ai', text: 'Here are the assignments I found:', events: data.events }]);
+            setMessages(msgs => [...msgs, { sender: 'ai', text: 'Here are the events I found:', events: data.events }]);
             setExtractedEvents(data.events);
         } else {
-            setMessages(msgs => [...msgs, { sender: 'ai', text: "I couldn't find any specific events or dates. Please try rephrasing or adding more details." }]);
+            setMessages(msgs => [...msgs, { sender: 'ai', text: "I couldn't find any specific events or dates in the document." }]);
         }
     } catch (error) {
         console.error("Failed to fetch from AI backend:", error);
-        setMessages(msgs => [...msgs, { sender: 'ai', text: 'Sorry, I ran into an error. Please check the backend connection and try again.' }]);
+        setMessages(msgs => [...msgs, { sender: 'ai', text: `Sorry, an error occurred: ${error.message}` }]);
     } finally {
         setIsProcessing(false);
+        // Reset file input to allow uploading the same file again
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
     }
+  };
+
+  const handleSend = async () => {
+    if (!input.trim() || isProcessing) return;
+    const formData = new FormData();
+    formData.append('text', input);
+    processTextOrFile(formData);
   };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (!file) return;
+    if (!file || isProcessing) return;
     
-    // For now, let's just show a message that this feature is under development.
-    // Full implementation would require backend support for file parsing.
-    setMessages(msgs => [
-        ...msgs, 
-        { sender: 'user', text: `Uploaded file: ${file.name}`},
-        { sender: 'ai', text: 'File upload processing is not yet implemented. Please paste the text directly.'}
-    ]);
+    const formData = new FormData();
+    formData.append('file', file);
+    processTextOrFile(formData, true);
   };
 
   const handleConfirmEvents = () => {
@@ -65,8 +75,9 @@ const AssignmentChat = ({ closeChat, addEvents }) => {
         id: Date.now() + Math.random(), // Basic unique ID
         date: new Date(event.date), // Assumes YYYY-MM-DD from backend
         title: event.title,
-        time: '12:00 AM', // Default time, can be improved
-        desc: `Added via AI from text: "${event.title}"`
+        courseName: event.courseName || '', // Add courseName
+        time: event.time || '12:00 AM', // Use extracted time or default
+        desc: event.desc || `Added via AI from text: "${event.title}"` // Use extracted desc or default
     }));
 
     addEvents(eventsToAdd);
@@ -107,8 +118,14 @@ const AssignmentChat = ({ closeChat, addEvents }) => {
             {msg.events && (
               <div style={{ marginTop: 10 }}>
                 {msg.events.map((ev, i) => (
-                  <div key={i} style={{ background: '#fff', color: '#232933', borderRadius: 8, padding: '8px 14px', margin: '8px 0', fontWeight: 600, fontSize: '1em', boxShadow: '0 2px 8px #18aaff11' }}>
-                    <span style={{ color: '#18aaff', fontWeight: 700 }}>{ev.date}</span> — {ev.title}
+                  <div key={i} style={{ background: 'rgba(255,255,255,0.95)', color: '#232933', borderRadius: 10, padding: '12px 16px', margin: '8px 0', fontSize: '0.95em', boxShadow: '0 2px 8px #18aaff11' }}>
+                    {ev.courseName && <div style={{ fontSize: '0.85em', fontWeight: 700, color: '#666', marginBottom: '4px', textTransform: 'uppercase' }}>{ev.courseName}</div>}
+                    <div style={{ fontWeight: 700, fontSize: '1.05em', color: '#111' }}>{ev.title}</div>
+                    <div style={{ margin: '4px 0', color: '#007bff', fontWeight: 600 }}>
+                      🗓️ {new Date(ev.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                      {ev.time && ` at ${ev.time}`}
+                    </div>
+                    {ev.desc && <p style={{ margin: '6px 0 0 0', fontStyle: 'italic', color: '#555' }}>"{ev.desc}"</p>}
                   </div>
                 ))}
               </div>
@@ -148,7 +165,7 @@ const AssignmentChat = ({ closeChat, addEvents }) => {
         <button onClick={() => fileInputRef.current.click()} style={{ background: 'none', border: 'none', color: '#18aaff', fontSize: '1.5em', cursor: 'pointer' }} title="Upload file">
           <i className="bx bx-paperclip"></i>
         </button>
-        <input type="file" accept=".txt,.pdf,image/*" style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileChange} disabled={isProcessing} />
+        <input type="file" accept=".txt,.pdf" style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileChange} disabled={isProcessing} />
         <button onClick={handleSend} style={{ background: 'none', border: 'none', color: '#18aaff', fontSize: '1.5em', cursor: 'pointer' }} title="Send" disabled={isProcessing}>
           <i className="bx bx-send"></i>
         </button>
