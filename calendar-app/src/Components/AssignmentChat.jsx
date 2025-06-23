@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 
 const AssignmentChat = ({ closeChat, addEvents }) => {
   const [messages, setMessages] = useState([
-    { sender: 'ai', text: "Hi! Paste your assignment list, and I'll extract the due dates and titles for you." }
+    { sender: 'ai', text: "Hi! I'm Calendarly. Paste your assignment list or upload a PDF, and I'll extract the due dates and titles for you." }
   ]);
   const [input, setInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);

@@ -284,12 +284,26 @@ body {
     background-color: var(--event-item-bg);
     color: var(--text-color-inverted);
     border-radius: 12px;
-    padding: 15px 20px;
+    padding: 15px 20px 15px 28px; /* Add left padding for color bar */
     margin-bottom: 15px;
     cursor: pointer;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     border: 1px solid rgba(0, 0, 0, 0.05);
-    border-left: 8px solid transparent; /* Default transparent border */
+    box-sizing: border-box;
+    position: relative;
+}
+
+/* Vertical color bar for event item */
+.event-color-bar {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 30px;
+    height: 100%;
+    border-top-left-radius: 12px;
+    border-bottom-left-radius: 12px;
+    background: #ccc;
+    z-index: 1;
 }
 
 .event-item:hover {

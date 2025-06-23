@@ -304,8 +304,9 @@ const handleSidebarColorChange = (newColor) => {
                   key={event.id} 
                   className="event-item" 
                   onClick={() => setExpandedEventId(expandedEventId === event.id ? null : event.id)}
-                  style={{ borderLeftColor: getCourseColor(event.courseName) }}
+                  style={{ position: 'relative' }}
                 >
+                  <div className="event-color-bar" style={{ backgroundColor: getCourseColor(event.courseName) }}></div>
                   <div className="event-details">
                     <p className="event-title">
                       {event.courseName ? `${event.courseName}: ` : ''}{event.title}
@@ -411,9 +412,9 @@ const handleSidebarColorChange = (newColor) => {
               <i className="bx bx-user"></i>
               <span className="fab-label">User</span>
             </button>
-            <button className="fab-vertical-item ai" title="AI Assistant" onClick={() => { setShowChat(true); setFabOpen(false); }}>
+            <button className="fab-vertical-item ai" title="Calendarly" onClick={() => { setShowChat(true); setFabOpen(false); }}>
               <i className="bx bx-bot"></i>
-              <span className="fab-label">AI Assistant</span>
+              <span className="fab-label">Calendarly</span>
             </button>
             <button className="fab-vertical-item settings" title="Settings" onClick={() => { setShowSettings(true); setFabOpen(false); }}>
               <i className="bx bx-cog"></i>
