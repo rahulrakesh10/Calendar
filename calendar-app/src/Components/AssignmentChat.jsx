@@ -21,7 +21,7 @@ const AssignmentChat = ({ closeChat, addEvents }) => {
     if (!isFile) setInput('');
 
     try {
-        const response = await fetch('http://localhost:5001/api/extract-events', {
+        const response = await fetch('http://localhost:3001/api/extract-events', {
             method: 'POST',
             body: dataPayload 
             // Note: No 'Content-Type' header. The browser sets it for FormData.
@@ -75,7 +75,7 @@ const AssignmentChat = ({ closeChat, addEvents }) => {
         id: Date.now() + Math.random(), // Basic unique ID
         date: new Date(event.date), // Assumes YYYY-MM-DD from backend
         title: event.title,
-        courseName: event.courseName || '', // Add courseName
+        category: event.category || event.courseName || '', // Map courseName to category
         time: event.time || '12:00 AM', // Use extracted time or default
         desc: event.desc || `Added via AI from text: "${event.title}"` // Use extracted desc or default
     }));
@@ -119,7 +119,7 @@ const AssignmentChat = ({ closeChat, addEvents }) => {
               <div style={{ marginTop: 10 }}>
                 {msg.events.map((ev, i) => (
                   <div key={i} style={{ background: 'rgba(255,255,255,0.95)', color: '#232933', borderRadius: 10, padding: '12px 16px', margin: '8px 0', fontSize: '0.95em', boxShadow: '0 2px 8px #18aaff11' }}>
-                    {ev.courseName && <div style={{ fontSize: '0.85em', fontWeight: 700, color: '#666', marginBottom: '4px', textTransform: 'uppercase' }}>{ev.courseName}</div>}
+                    {ev.category && <div style={{ fontSize: '0.85em', fontWeight: 700, color: '#666', marginBottom: '4px', textTransform: 'uppercase' }}>{ev.category}</div>}
                     <div style={{ fontWeight: 700, fontSize: '1.05em', color: '#111' }}>{ev.title}</div>
                     <div style={{ margin: '4px 0', color: '#007bff', fontWeight: 600 }}>
                       🗓️ {new Date(ev.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}

@@ -124,11 +124,11 @@ body {
 }
 
 .day-name, .day, .empty-day {
+    font-size: 1.6rem;
     display: flex;
     justify-content: center;
     align-items: center;
     border-radius: 12px; /* Softer radius */
-    font-size: 1rem;
 }
 
 .day-name {
@@ -138,6 +138,7 @@ body {
 }
 
 .day {
+    position: relative;
     cursor: pointer;
     transition: background-color 0.3s ease, color 0.3s ease;
     font-weight: 600;
@@ -149,7 +150,7 @@ body {
 }
 
 .day.selected-day {
-    background-color: var(--primary-accent-color);
+    background: linear-gradient(135deg, #007bff 60%, #00c6ff 100%);
     color: #fff;
 }
 
@@ -159,7 +160,7 @@ body {
 }
 
 .today {
-    background-color: var(--primary-accent-color);
+    background: linear-gradient(135deg, #8B5CF6 60%, #EC4899 100%);
     color: #fff;
     font-weight: 700;
 }
@@ -181,19 +182,20 @@ body {
 }
 
 .event-dots {
-  position: absolute;
-  bottom: 8px;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: center;
-  gap: 4px;
+    position: absolute;
+    left: 50%;
+    bottom: 8px;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 4px;
+    z-index: 2;
 }
 
 .event-dot {
-  width: 5px;
-  height: 5px;
-  border-radius: 50%;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #ff4d4f;
 }
 
 /* Sidebar Styles */
@@ -312,6 +314,7 @@ body {
 }
 
 .event-details {
+    margin-left: 20px; 
     display: flex;
     flex-direction: column;
 }
@@ -340,6 +343,7 @@ body {
     font-size: 1rem;
     line-height: 1.4;
     color: #6c757d;
+    margin-left: 20px; 
 }
 
 .event-actions button {

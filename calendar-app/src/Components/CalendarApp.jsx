@@ -3,17 +3,17 @@ import AssignmentChat from './AssignmentChat';
 
 // --- Persistent Course Color Logic ---
 // Moved outside the component to prevent being reset on re-renders.
-const courseColors = {};
+const categoryColors = {};
 let lastColorIndex = -1;
-const colorPaletteForCourses = ['#EF4444', '#3B82F6', '#22C55E', '#EAB308', '#8B5CF6', '#F97316', '#14B8A6', '#EC4899', '#84CC16', '#6366F1', '#F59E0B', '#06B6D4'];
+const colorPaletteForCategories = ['#EF4444', '#3B82F6', '#22C55E', '#EAB308', '#8B5CF6', '#F97316', '#14B8A6', '#EC4899', '#84CC16', '#6366F1', '#F59E0B', '#06B6D4'];
 
-const getCourseColor = (courseName) => {
-    if (!courseName) return 'transparent';
-    if (!courseColors[courseName]) {
-        lastColorIndex = (lastColorIndex + 1) % colorPaletteForCourses.length;
-        courseColors[courseName] = colorPaletteForCourses[lastColorIndex];
+const getCategoryColor = (category) => {
+    if (!category) return '#bbb'; // Neutral gray for non-category events
+    if (!categoryColors[category]) {
+        lastColorIndex = (lastColorIndex + 1) % colorPaletteForCategories.length;
+        categoryColors[category] = colorPaletteForCategories[lastColorIndex];
     }
-    return courseColors[courseName];
+    return categoryColors[category];
 };
 // --- End of Color Logic ---
 
@@ -31,7 +31,7 @@ const [showEventPopup, setShowEventPopup] = useState(false);
 const [events, setEvents] = useState([]);
 const [formData, setFormData] = useState({
   title: "",
-  courseName: "",
+  category: "",
   hours: "",
   minutes: "",
   ampm: "AM",
@@ -107,7 +107,7 @@ const openAddEventPopup = () => {
     setShowEventPopup(true);
     setEditMode(false);
     setEditingEventId(null);
-    setFormData({ title: "", courseName: "", hours: "", minutes: "", ampm: "AM", text: "", desc: "" });
+    setFormData({ title: "", category: "", hours: "", minutes: "", ampm: "AM", text: "", desc: "" });
 }
 
 const handleInputChange = (field, value) => {
@@ -128,13 +128,13 @@ const addEvent = () => {
         id: Date.now(),
         date: selectedDate,
         title: formData.title.trim(),
-        courseName: formData.courseName.trim(),
+        category: formData.category.trim(),
         time: `${formData.hours.padStart(2, '0')}:${formData.minutes.padStart(2, '0')} ${formData.ampm}`,
         desc: formData.desc.trim()
     };
     setEvents(prev => [...prev, newEvent]);
     setShowEventPopup(false);
-    setFormData({ title: "", courseName: "", hours: "", minutes: "", ampm: "AM", desc: "" });
+    setFormData({ title: "", category: "", hours: "", minutes: "", ampm: "AM", desc: "" });
 }
 
 const editEvent = (eventId) => {
@@ -144,7 +144,7 @@ const editEvent = (eventId) => {
         const [hours, minutes] = time.split(':');
         setFormData({
             title: event.title || "",
-            courseName: event.courseName || "",
+            category: event.category || "",
             hours: hours,
             minutes: minutes,
             ampm: ampm || "AM",
@@ -169,7 +169,7 @@ const updateEvent = () => {
                 ...event,
                 date: selectedDate,
                 title: formData.title.trim(),
-                courseName: formData.courseName.trim(),
+                category: formData.category.trim(),
                 time: `${formData.hours.padStart(2, '0')}:${formData.minutes.padStart(2, '0')} ${formData.ampm}`,
                 desc: formData.desc.trim()
               }
@@ -178,7 +178,7 @@ const updateEvent = () => {
     setShowEventPopup(false);
     setEditMode(false);
     setEditingEventId(null);
-    setFormData({ title: "", courseName: "", hours: "", minutes: "", ampm: "AM", desc: "" });
+    setFormData({ title: "", category: "", hours: "", minutes: "", ampm: "AM", desc: "" });
 }
 
 const removeEvent = (eventId) => {
@@ -188,14 +188,14 @@ const removeEvent = (eventId) => {
     setShowEventPopup(false);
     setEditMode(false);
     setEditingEventId(null);
-    setFormData({ title: "", courseName: "", hours: "", minutes: "", ampm: "AM", text: "", desc: "" });
+    setFormData({ title: "", category: "", hours: "", minutes: "", ampm: "AM", text: "", desc: "" });
 }
 
 const closePopup = () => {
     setShowEventPopup(false);
     setEditMode(false);
     setEditingEventId(null);
-    setFormData({ title: "", courseName: "", hours: "", minutes: "", ampm: "AM", text: "", desc: "" });
+    setFormData({ title: "", category: "", hours: "", minutes: "", ampm: "AM", text: "", desc: "" });
 }
 
 // Close FAB menu when clicking outside
@@ -219,6 +219,17 @@ const handleThemeChange = (newTheme) => {
 const handleSidebarColorChange = (newColor) => {
     setSettings(prev => ({ ...prev, sidebarColor: newColor }));
 };
+
+// Add this useEffect after your state declarations and before your return statement
+useEffect(() => {
+  // Migrate old events: if category is missing but courseName exists, copy it
+  setEvents(prevEvents => prevEvents.map(event => ({
+    ...event,
+    category: event.category || event.courseName || '',
+  })));
+}, []);
+
+const uniqueCategories = Array.from(new Set(events.map(e => e.category).filter(Boolean)));
 
   return (
     <>
@@ -252,7 +263,7 @@ const handleSidebarColorChange = (newColor) => {
               // Get colors for events on this day
               const eventColorsOnDay = events
                 .filter(e => new Date(e.date).toDateString() === thisDate.toDateString())
-                .map(e => getCourseColor(e.courseName))
+                .map(e => getCategoryColor(e.category))
                 .filter((value, index, self) => self.indexOf(value) === index); // Unique colors
 
               return (
@@ -306,10 +317,10 @@ const handleSidebarColorChange = (newColor) => {
                   onClick={() => setExpandedEventId(expandedEventId === event.id ? null : event.id)}
                   style={{ position: 'relative' }}
                 >
-                  <div className="event-color-bar" style={{ backgroundColor: getCourseColor(event.courseName) }}></div>
+                  <div className="event-color-bar" style={{ backgroundColor: getCategoryColor(event.category) }}></div>
                   <div className="event-details">
                     <p className="event-title">
-                      {event.courseName ? `${event.courseName}: ` : ''}{event.title}
+                      {event.category ? `${event.category}: ` : ''}{event.title}
                     </p>
                     <p className="event-time">{new Date(event.date).toLocaleDateString()} at {event.time}</p>
                   </div>
@@ -335,7 +346,42 @@ const handleSidebarColorChange = (newColor) => {
             <div className="event-popup" onClick={(e) => e.stopPropagation()}>
               <h3>{editMode ? 'Edit Event' : 'Add Event'}</h3>
               <input type="text" placeholder="Event Title (max 20 chars)" value={formData.title} onChange={(e) => handleInputChange('title', e.target.value)} maxLength="20" />
-              <input type="text" placeholder="Course Name (e.g., COMP 101)" value={formData.courseName} onChange={(e) => handleInputChange('courseName', e.target.value)} maxLength="30" />
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+                <input
+                  type="text"
+                  placeholder="Category (e.g., COMP 101)"
+                  value={formData.category}
+                  onChange={e => handleInputChange('category', e.target.value)}
+                  maxLength="30"
+                  style={{ flex: 1 }}
+                />
+                {uniqueCategories.length > 0 && (
+                  <select
+                    value=""
+                    onChange={e => {
+                      if (e.target.value) handleInputChange('category', e.target.value);
+                    }}
+                    style={{
+                      minWidth: 40,
+                      maxWidth: 120,
+                      padding: '6px 8px',
+                      fontSize: '1em',
+                      borderRadius: 8,
+                      background: '#232933',
+                      color: '#fff',
+                      border: '1px solid #444',
+                      cursor: 'pointer',
+                      height: 38
+                    }}
+                    title="Select existing category"
+                  >
+                    <option value="">▼</option>
+                    {uniqueCategories.map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))}
+                  </select>
+                )}
+              </div>
               <textarea placeholder="Event Description (max 60 chars)" value={formData.desc} onChange={(e) => handleInputChange('desc', e.target.value)} maxLength="60"></textarea>
               <div className="time-picker">
                 <input type="number" placeholder="HH" min="1" max="12" value={formData.hours} onChange={(e) => handleInputChange('hours', e.target.value)} />
@@ -368,6 +414,7 @@ const handleSidebarColorChange = (newColor) => {
             </div>
           </div>
         )}
+
       </div>
       {/* FAB is now outside the container to ensure correct positioning on all screen sizes */}
       <div className="fab-root" ref={fabRef}>
