@@ -1,5 +1,7 @@
 import React, { useRef, useState } from 'react';
 
+const apiUrl = import.meta.env.VITE_API_URL;
+
 const AssignmentChat = ({ closeChat, addEvents }) => {
   const [messages, setMessages] = useState([
     { sender: 'ai', text: "Hi! I'm Calendarly. Paste your assignment list or upload a PDF, and I'll extract the due dates and titles for you." }
@@ -21,7 +23,7 @@ const AssignmentChat = ({ closeChat, addEvents }) => {
     if (!isFile) setInput('');
 
     try {
-        const response = await fetch('http://localhost:3001/api/extract-events', {
+        const response = await fetch(`${apiUrl}/api/extract-events`, {
             method: 'POST',
             body: dataPayload 
             // Note: No 'Content-Type' header. The browser sets it for FormData.
