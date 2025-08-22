@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 
-const apiUrl = import.meta.env.VITE_API_URL;
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 const AssignmentChat = ({ closeChat, addEvents }) => {
   const [messages, setMessages] = useState([

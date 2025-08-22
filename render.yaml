@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: calendar-backend
+    env: node
+    plan: free
+    buildCommand: cd calendar-backend && npm install
+    startCommand: cd calendar-backend && node index.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: PORT
+        value: 10000

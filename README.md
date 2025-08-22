@@ -21,10 +21,13 @@ This project includes both a **React-based frontend** and a **Node.js/Express ba
 ## 🚀 Features
 
 - 📆 Visual calendar with assignment/event tracking
-- 💬 Chat-style UI for adding tasks (e.g. AssignmentChat)
+- 🤖 AI-powered event extraction from text and PDF files
+- 💬 Chat-style UI for adding tasks (AssignmentChat)
+- 📊 Daily usage limits (3 requests per day)
 - 🔗 Connected frontend-backend architecture
 - 📁 Local database storage (SQLite)
 - ✨ Modular and clean codebase
+- 🌐 Production-ready deployment setup
 
 ---
 
@@ -67,7 +70,25 @@ cd Calendarly
 
 ---
 
-### 🔹 2. Setup the Backend
+### 🔹 2. Environment Setup
+
+#### Backend Environment Variables
+```bash
+cd calendar-backend
+cp .env.example .env
+# Edit .env and add your GEMINI_API_KEY
+```
+
+#### Frontend Environment Variables
+```bash
+cd calendar-app
+cp .env.example .env
+# Edit .env and set VITE_API_URL to your backend URL
+```
+
+---
+
+### 🔹 3. Setup the Backend
 
 ```bash
 cd calendar-backend
@@ -83,7 +104,7 @@ nodemon index.js
 
 ---
 
-### 🔹 3. Setup the Frontend
+### 🔹 4. Setup the Frontend
 
 Open a new terminal tab:
 
@@ -95,10 +116,33 @@ npm run dev
 
 ---
 
+## 🚀 Deployment
+
+### Frontend (Vercel)
+1. Push your code to GitHub
+2. Connect your repository to Vercel
+3. Set environment variable `VITE_API_URL` to your backend URL
+4. Deploy
+
+### Backend (Render)
+1. Push your code to GitHub
+2. Connect your repository to Render
+3. Set environment variables:
+   - `GEMINI_API_KEY`: Your Gemini API key
+   - `NODE_ENV`: production
+4. Deploy
+
+**Note**: Update the CORS origin in `calendar-backend/index.js` with your actual Vercel domain.
+
+---
+
 ## 🌐 API Endpoints (Backend)
 
 | Method | Endpoint         | Description               |
 |--------|------------------|---------------------------|
+| GET    | `/`              | Health check              |
+| GET    | `/api/usage`     | Get daily usage limit     |
+| POST   | `/api/extract-events` | Extract events from text/PDF |
 | GET    | `/events`        | Fetch all calendar events |
 | POST   | `/events`        | Add a new event           |
 | DELETE | `/events/:id`    | Delete an event by ID     |
