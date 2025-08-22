@@ -9,7 +9,25 @@ const AssignmentChat = ({ closeChat, addEvents }) => {
   const [input, setInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [extractedEvents, setExtractedEvents] = useState(null);
+  const [usage, setUsage] = useState(null);
   const fileInputRef = useRef();
+
+  // Fetch usage on component mount
+  React.useEffect(() => {
+    fetchUsage();
+  }, []);
+
+  const fetchUsage = async () => {
+    try {
+      const response = await fetch(`${apiUrl}/api/usage`);
+      if (response.ok) {
+        const usageData = await response.json();
+        setUsage(usageData);
+      }
+    } catch (error) {
+      console.error('Failed to fetch usage:', error);
+    }
+  };
 
   const processTextOrFile = async (dataPayload, isFile = false) => {
     setIsProcessing(true);
@@ -31,6 +49,17 @@ const AssignmentChat = ({ closeChat, addEvents }) => {
 
         if (!response.ok) {
             const errorData = await response.json();
+            
+            // Handle daily limit error
+            if (response.status === 429 && errorData.error && errorData.error.includes('Daily limit exceeded')) {
+                setMessages(msgs => [...msgs, { 
+                    sender: 'ai', 
+                    text: `Daily limit reached! You've used ${errorData.used}/${errorData.limit} requests today. The limit resets at midnight.` 
+                }]);
+                await fetchUsage(); // Refresh usage data
+                return;
+            }
+            
             throw new Error(errorData.error || `HTTP error! status: ${response.status}`);
         }
 
@@ -42,6 +71,9 @@ const AssignmentChat = ({ closeChat, addEvents }) => {
         } else {
             setMessages(msgs => [...msgs, { sender: 'ai', text: "I couldn't find any specific events or dates in the document." }]);
         }
+        
+        // Refresh usage data after successful request
+        await fetchUsage();
     } catch (error) {
         console.error("Failed to fetch from AI backend:", error);
         setMessages(msgs => [...msgs, { sender: 'ai', text: `Sorry, an error occurred: ${error.message}` }]);
@@ -103,6 +135,23 @@ const AssignmentChat = ({ closeChat, addEvents }) => {
       height: 520,
       overflow: 'hidden',
     }}>
+      {/* Usage indicator */}
+      {usage && (
+        <div style={{
+          background: 'rgba(24,170,255,0.1)',
+          borderBottom: '1px solid rgba(24,170,255,0.3)',
+          padding: '8px 16px',
+          fontSize: '0.85em',
+          color: '#18aaff',
+          textAlign: 'center',
+          fontWeight: 600
+        }}>
+          {usage.remaining > 0 ? 
+            `${usage.remaining} of ${usage.limit} requests remaining today` :
+            'Daily limit reached - resets at midnight'
+          }
+        </div>
+      )}
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px 18px 12px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
         {messages.map((msg, idx) => (
           <div key={idx} style={{
