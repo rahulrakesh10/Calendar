@@ -1,0 +1,9 @@
+# Ignore environment file
+.env
+
+# Ignore node dependencies
+node_modules/
+
+# Ignore database
+calendar.db
+
