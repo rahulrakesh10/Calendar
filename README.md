@@ -1,6 +1,6 @@
 # 📅 Calendarly - Full Stack Calendar App
 
-**Calendarly** is a full stack calendar web application designed to help students and professionals stay organized with important deadlines, assignments, and personal events.
+**Calendarly** is a full stack calendar web application designed to help students and professionals stay organized with important deadlines, assignments, and personal events. By using ai to add it to the new calendar
 
 This project includes both a **React-based frontend** and a **Node.js/Express backend**, communicating via REST APIs and backed by a lightweight database.
 
