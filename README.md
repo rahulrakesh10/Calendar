@@ -171,15 +171,6 @@ npm run dev
 
 ---
 
-## 🚧 Future Improvements
-
-- 🔐 Add user authentication
-- 🔁 Support recurring events
-- ✏️ Allow editing events
-- 🗓️ Google Calendar sync
-- 🔔 Notifications & Reminders
-
----
 
 ## 📬 Contributions
 
