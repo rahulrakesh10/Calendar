@@ -162,14 +162,7 @@ npm run dev
 - Express
 - SQLite (via `sqlite3` or a custom `db.js`)
 
----
 
-## 👨‍💻 Author
-
-- **Rahul Rakesh**
-- GitHub: [@rahulrakesh10](https://github.com/rahulrakesh10)
-
----
 
 
 ## 📬 Contributions
