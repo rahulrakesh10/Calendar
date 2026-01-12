@@ -102,18 +102,6 @@ Or use:
 nodemon index.js
 ```
 
----
-
-### 🔹 4. Setup the Frontend
-
-Open a new terminal tab:
-
-```bash
-cd calendar-app
-npm install
-npm run dev
-```
-
 
 ---
 
