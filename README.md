@@ -134,18 +134,6 @@ npm run dev
 
 **Note**: Update the CORS origin in `calendar-backend/index.js` with your actual Vercel domain.
 
----
-
-## 🌐 API Endpoints (Backend)
-
-| Method | Endpoint         | Description               |
-|--------|------------------|---------------------------|
-| GET    | `/`              | Health check              |
-| GET    | `/api/usage`     | Get daily usage limit     |
-| POST   | `/api/extract-events` | Extract events from text/PDF |
-| GET    | `/events`        | Fetch all calendar events |
-| POST   | `/events`        | Add a new event           |
-| DELETE | `/events/:id`    | Delete an event by ID     |
 
 ---
 
