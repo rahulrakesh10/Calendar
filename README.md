@@ -114,26 +114,6 @@ npm install
 npm run dev
 ```
 
----
-
-## 🚀 Deployment
-
-### Frontend (Vercel)
-1. Push your code to GitHub
-2. Connect your repository to Vercel
-3. Set environment variable `VITE_API_URL` to your backend URL
-4. Deploy
-
-### Backend (Render)
-1. Push your code to GitHub
-2. Connect your repository to Render
-3. Set environment variables:
-   - `GEMINI_API_KEY`: Your Gemini API key
-   - `NODE_ENV`: production
-4. Deploy
-
-**Note**: Update the CORS origin in `calendar-backend/index.js` with your actual Vercel domain.
-
 
 ---
 
