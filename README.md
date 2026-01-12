@@ -88,23 +88,6 @@ cp .env.example .env
 
 ---
 
-### 🔹 3. Setup the Backend
-
-```bash
-cd calendar-backend
-npm install
-node index.js
-```
-
-Or use:
-
-```bash
-nodemon index.js
-```
-
-
----
-
 ## 🛠 Tech Stack
 
 ### Frontend:
