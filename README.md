@@ -68,10 +68,6 @@ git clone https://github.com/rahulrakesh10/Calendarly.git
 cd Calendarly
 ```
 
----
-
----
-
 ## 🛠 Tech Stack
 
 ### Frontend:
