@@ -59,14 +59,6 @@ Calendarly/
 
 ---
 
-## ⚙️ Setup Instructions
-
-### 🔹 1. Clone the repo
-
-```bash
-git clone https://github.com/rahulrakesh10/Calendarly.git
-cd Calendarly
-```
 
 ## 🛠 Tech Stack
 
