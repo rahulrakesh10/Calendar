@@ -79,12 +79,6 @@ cp .env.example .env
 # Edit .env and add your GEMINI_API_KEY
 ```
 
-#### Frontend Environment Variables
-```bash
-cd calendar-app
-cp .env.example .env
-# Edit .env and set VITE_API_URL to your backend URL
-```
 
 ---
 
