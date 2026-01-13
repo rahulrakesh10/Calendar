@@ -70,16 +70,6 @@ cd Calendarly
 
 ---
 
-### 🔹 2. Environment Setup
-
-#### Backend Environment Variables
-```bash
-cd calendar-backend
-cp .env.example .env
-# Edit .env and add your GEMINI_API_KEY
-```
-
-
 ---
 
 ## 🛠 Tech Stack
